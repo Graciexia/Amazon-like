@@ -1,65 +1,52 @@
 class ProductsController < ApplicationController
-  before_action :set_product, only: [:show, :edit, :update, :destroy]
 
-  # GET /products
-  # GET /products.json
+
   def index
-    @products = Product.all
+    @products = Product.paginate(:page => params[:page], :per_page => 30)
+
   end
 
-  # GET /products/1
-  # GET /products/1.json
   def show
+    set_product
   end
 
-  # GET /products/new
-  def new
-    @product = Product.new
+  # def search_by_item
+  #   products = Product.all
+  #   paired_item = []
+  #   products.each do |product|
+  #     if
+
+  # end
+
+  def search_by_category
+    paired_category = Product.where(category: params[:category])
   end
 
-  # GET /products/1/edit
-  def edit
-  end
-
-  # POST /products
-  # POST /products.json
-  def create
-    @product = Product.new(product_params)
-
-    respond_to do |format|
-      if @product.save
-        format.html { redirect_to @product, notice: 'Product was successfully created.' }
-        format.json { render :show, status: :created, location: @product }
-      else
-        format.html { render :new }
-        format.json { render json: @product.errors, status: :unprocessable_entity }
-      end
+  def search_by_price
+    if params[:price_level == "high"]
+      @products = Product.where("price >= 50")
+    elsif params[:price_level == "med"]
+      @products = Product.where("price >= 20 and price < 50")
+    elsif params[:price_level == "low"]
+      @products = Product.where("price < 20")
+    else
+      @products = Product.all
     end
+    render json: @products
   end
 
-  # PATCH/PUT /products/1
-  # PATCH/PUT /products/1.json
-  def update
-    respond_to do |format|
-      if @product.update(product_params)
-        format.html { redirect_to @product, notice: 'Product was successfully updated.' }
-        format.json { render :show, status: :ok, location: @product }
-      else
-        format.html { render :edit }
-        format.json { render json: @product.errors, status: :unprocessable_entity }
-      end
-    end
+  def search_by_instock
+    @product = Product.where("stock > 0")
+   # products = Product.all
+   # @prodct = []
+   # products.each do |product|
+   #    if product.in_stock > 0
+   #      @product << product
+   #    end
+   #  end
   end
 
-  # DELETE /products/1
-  # DELETE /products/1.json
-  def destroy
-    @product.destroy
-    respond_to do |format|
-      format.html { redirect_to products_url, notice: 'Product was successfully destroyed.' }
-      format.json { head :no_content }
-    end
-  end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.

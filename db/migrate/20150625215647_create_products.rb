@@ -2,10 +2,10 @@ class CreateProducts < ActiveRecord::Migration
   def change
     create_table :products do |t|
       t.string :title
-      t.string :price
+      t.integer :price
       t.string :description
-      t.string :in_stock
-      t.belongs_to :user, index: true, foreign_key: true
+      t.integer :in_stock
+      t.string :category
 
       t.timestamps null: false
     end

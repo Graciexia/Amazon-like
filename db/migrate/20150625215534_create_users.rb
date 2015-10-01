@@ -1,8 +1,8 @@
 class CreateUsers < ActiveRecord::Migration
   def change
     create_table :users do |t|
-      t.string :name
-      t.string :email
+      t.string :name, default: "name"
+      t.string :email, default: "email"
       t.string :password_digest
       t.boolean :admin, default: false
 
