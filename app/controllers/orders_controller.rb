@@ -1,74 +1,67 @@
 class OrdersController < ApplicationController
-  before_action :set_order, only: [:show, :edit, :update, :destroy]
 
-  # GET /orders
-  # GET /orders.json
   def index
     @orders = Order.all
   end
 
-  # GET /orders/1
-  # GET /orders/1.json
-  def show
-  end
 
-  # GET /orders/new
   def new
     @order = Order.new
   end
 
-  # GET /orders/1/edit
-  def edit
+  def show
+    @current_order = User.find(current_user.id).orders
+      .where(user_id: current_user.id, complete: false)[0]
+      .products_orders.order(quantity: :asc)
+    @total_price = 0
+    @current_order.each do |item|
+      @total_price += (item.quantity * item.product.price)
+    end
   end
 
-  # POST /orders
-  # POST /orders.json
   def create
-    @order = Order.new(order_params)
-
-    respond_to do |format|
-      if @order.save
-        format.html { redirect_to @order, notice: 'Order was successfully created.' }
-        format.json { render :show, status: :created, location: @order }
-      else
-        format.html { render :new }
-        format.json { render json: @order.errors, status: :unprocessable_entity }
-      end
-    end
+    order = Order.find_or_create_by(user_id: current_user.id, complete: false)
+    products_order = OrderProduct.find_or_create_by(order_id: order.id, product_id: params[:product_id])
+    products_order.quantity += 1
+    products_order.save!
+    redirect_to root_url
   end
 
-  # PATCH/PUT /orders/1
-  # PATCH/PUT /orders/1.json
   def update
-    respond_to do |format|
-      if @order.update(order_params)
-        format.html { redirect_to @order, notice: 'Order was successfully updated.' }
-        format.json { render :show, status: :ok, location: @order }
-      else
-        format.html { render :edit }
-        format.json { render json: @order.errors, status: :unprocessable_entity }
+    order_item = ProductsOrder.find(params[:order_id])
+    if order_item.quantity <= 1
+      order_item.destroy
+      message = { alert: 'Item Removed From Cart!' }
+      unless ProductsOrder.all.where(order_id: params[:order_id])
+        Order.find(params[:order_id]).destroy
       end
+    else
+      order_item.quantity -= 1
+      order_item.save
+      message = { alert: "1 #{order_item.product.title} Removed."}
     end
+    redirect_to root_url, message
   end
 
-  # DELETE /orders/1
-  # DELETE /orders/1.json
+  def checkout
+    cart_items = ProductsOrder.where(order_id: params[:order_id])
+    cart_items.each do |item|
+      item.order.complete = true
+      item.order.save
+    end
+    redirect_to root_path, notice: 'Checkout Successfull, please allow up to 1024 weeks for delivery'
+  end
+
   def destroy
-    @order.destroy
-    respond_to do |format|
-      format.html { redirect_to orders_url, notice: 'Order was successfully destroyed.' }
-      format.json { head :no_content }
-    end
+    ProductsOrder.destroy(params[:order_id])
+    redirect_to :back
   end
 
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_order
-      @order = Order.find(params[:id])
-    end
+  def admin
+    @orders = Order.all.paginate(:page => params[:page], :per_page => 12)
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def order_params
-      params.require(:order).permit(:status)
-    end
+  def admin_show
+    @order = Order.find(params[:order_id])
+  end
 end

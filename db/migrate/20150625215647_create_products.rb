@@ -5,7 +5,7 @@ class CreateProducts < ActiveRecord::Migration
       t.integer :price
       t.string :description
       t.integer :in_stock
-      t.string :category
+      t.string :pic, null: false, default: 'picture url'
 
       t.timestamps null: false
     end

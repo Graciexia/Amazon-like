@@ -6,9 +6,9 @@ var Navigation = React.createClass ({
       <nav>
       <NavLink name='Home' url='/' />
       <NavLink name='Cart' url='/orders' />
-      <NavLink name='SignUp' url='/signup' />
-      <NavLink name='Login' url='/login' />
-      <NavLink name='Logout' url='/logout' />
+      <NavLink name='SignUp' url='/users/sign_up' />
+      <NavLink name='Login' url='/users/sign_in' />
+      <NavLink name='Logout' url='/users/sign_out' />
       </nav>
     );
   },
