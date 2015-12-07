@@ -1,7 +1,7 @@
 50.times do
   password = Faker::Internet.password
-  user = User.create(name: Faker::Internet.name,
-                     email: Faker::Internet.safe_email)
+  user = User.create(email: Faker::Internet.safe_email,
+                     password: password, password_confirmation: password)
 
   product = Product.create(title: Faker::Commerce.product_name,
                            price: Faker::Commerce.price,

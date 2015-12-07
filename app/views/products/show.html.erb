@@ -1,28 +1,39 @@
 <p id="notice"><%= notice %></p>
-<p>
-  <strong>Category:</strong>
-  <%= @product.category %>
-</p>
 
 <p>
-  <strong>Title:</strong>
-  <%= @product.title %>
+<%= image_tag(@products.pic, size: "200x200") %>
 </p>
+  <strong>Title:</strong>
+  <%= @products.title %>
 
 <p>
   <strong>Price:</strong>
-  <%= @product.price %>
+  <%= @products.price %>
 </p>
 
 <p>
   <strong>Description:</strong>
-  <%= @product.description %>
+  <%= @products.description %>
 </p>
 
-<p>
-  <strong>In stock:</strong>
-  <%= @product.in_stock %>
-</p>
 
-<%= link_to 'Edit', edit_product_path(@product) %> |
+  <% if @products.in_stock > 0 %>
+    <label for="quantity">Qty: </label>
+    <select id="quantity" name="quantity">
+      <% n = @products.in_stock %>
+      <% (1..n).each do |i| %>
+        <option value=<%=i%>><%=i%></option>
+      <% end %>
+    </select>
+      <% else %>
+  <strong>Sold out </strong>
+      <% end %>
+</br></br></br>
+
+
+  <%= link_to 'Buy Now', cart_path(current_user.id, @products.id), {:method => :post,  class:"btn btn-success col-md-2", role:"button"} %>
+
+</br></br></br>
+
+
 <%= link_to 'Back', products_path %>
